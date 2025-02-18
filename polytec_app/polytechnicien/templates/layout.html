@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    {% load static %}
+    <head>   
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Django Polytec App - {% block title %}{% endblock title %}</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        {% block head %}{% endblock head %}
+    </head>
+    
+<body>
+    <header style="background-color: lightblue; text-align: center; padding: 5px;">
+        <h1 style="margin: 0;">Django Polytec App - Partie 1</h1>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock content %}
+    </main>
+</body>
+</html>

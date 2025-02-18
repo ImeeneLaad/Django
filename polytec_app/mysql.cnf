@@ -1,0 +1,5 @@
+[client]
+database = django_polytec_app
+user = root
+password =
+default-character-set = utf8

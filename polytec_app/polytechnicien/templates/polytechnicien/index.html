@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulaire Django</title>
+    <style>
+        /* Style général du formulaire */
+        form.join-form {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+        }
+
+        /* Style des labels */
+        form.join-form label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+            display: block;
+        }
+
+        /* Style des champs de saisie */
+        form.join-form input[type="text"],
+        form.join-form input[type="email"],
+        form.join-form input[type="url"],
+        form.join-form input[type="file"],
+        form.join-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        form.join-form input[type="text"]:focus,
+        form.join-form input[type="email"]:focus,
+        form.join-form input[type="url"]:focus,
+        form.join-form input[type="file"]:focus,
+        form.join-form textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Style des boutons */
+        form.join-form button[type="submit"],
+        form.join-form button[type="reset"] {
+            width: 48%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form.join-form button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+        }
+
+        form.join-form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        form.join-form button[type="reset"] {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        form.join-form button[type="reset"]:hover {
+            background-color: #5a6268;
+        }
+
+        /* Alignement des boutons */
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        /* Style de l'image de profil */
+        .profile-image-container {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-image-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #007bff2b;
+        }
+
+        /* Style des erreurs */
+        .text-sm.text-red-600 {
+            font-size: 0.875rem;
+            color: #dc3545;
+            margin-top: 0.25rem;
+        }
+
+        /* Style pour la grille des champs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .messages {
+        margin: 1rem 0;
+        padding: 1rem;
+        border-radius: 5px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .messages .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .messages .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <form action="{% url 'homepage' %}" method="post" class="join-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Image de profil -->
+        <div class="profile-image-container">
+            <label for="picture" class="block mb-2 text-lg">Une image de toi</label>
+            <img src="https://www.polytecsousse.tn/wp-content/uploads/2020/09/cropped-logo-polytech.png" 
+                 alt="Logo Polytech" 
+                 id="profile-preview">
+            <input type="file" name="picture" id="picture" class="mt-2" onchange="previewImage(event)">
+        </div>
+
+        <!-- Grille des champs -->
+        <div class="form-grid">
+            <div>
+                <label>Nom et prénom:</label> {{ form.full_name }}
+                <span class="text-sm text-red-600">{{ form.full_name.errors }}</span>
+            </div>
+
+            <div>
+                <label>Email:</label> {{ form.email }}
+                <span class="text-sm text-red-600">{{ form.email.errors }}</span>
+            </div>
+
+            <div>
+                <label>Titre :</label> {{ form.title }}
+                <span class="text-sm text-red-600">{{ form.title.errors }}</span>
+            </div>
+
+            <div>
+                <label>Compte Facebook:</label> {{ form.facebook }}
+                <span class="text-sm text-red-600">{{ form.facebook.errors }}</span>
+            </div>
+
+            <div>
+                <label>Compte Twitter:</label> {{ form.twitter }}
+                <span class="text-sm text-red-600">{{ form.twitter.errors }}</span>
+            </div>
+
+            <div>
+                <label>Compte LinkedIn:</label> {{ form.linkedin }}
+                <span class="text-sm text-red-600">{{ form.linkedin.errors }}</span>
+            </div>
+
+            <div>
+                <label>Site Web:</label> {{ form.website }}
+                <span class="text-sm text-red-600">{{ form.website.errors }}</span>
+            </div>
+        </div>
+
+        <!-- Boutons -->
+        <div class="form-buttons">
+            <button type="submit" class="bg-green">Valider</button>
+            <button type="reset" class="bg-green">Reset</button>
+        </div>
+    </form>
+
+    <!-- Script pour prévisualiser l'image -->
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            const preview = document.getElementById('profile-preview');
+            reader.onload = function() {
+                preview.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+</body>
+</html>
