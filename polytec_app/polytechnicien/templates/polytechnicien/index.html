@@ -1,222 +1,722 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Formulaire Django</title>
+    <title>Formulaire Django Interactif</title>
     <style>
-        /* Style général du formulaire */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --error-color: #dc2626;
+            --success-color: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
         form.join-form {
-            max-width: 600px;
+            max-width: 800px;
             margin: 2rem auto;
             padding: 2rem;
-            background: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-family: Arial, sans-serif;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05),
+                0 10px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Style des labels */
-        form.join-form label {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: #333;
-            display: block;
-        }
-
-        /* Style des champs de saisie */
-        form.join-form input[type="text"],
-        form.join-form input[type="email"],
-        form.join-form input[type="url"],
-        form.join-form input[type="file"],
-        form.join-form textarea {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        form.join-form input[type="text"]:focus,
-        form.join-form input[type="email"]:focus,
-        form.join-form input[type="url"]:focus,
-        form.join-form input[type="file"]:focus,
-        form.join-form textarea:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-        /* Style des boutons */
-        form.join-form button[type="submit"],
-        form.join-form button[type="reset"] {
-            width: 48%;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        form.join-form button[type="submit"] {
-            background-color: #007bff;
-            color: white;
-        }
-
-        form.join-form button[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        form.join-form button[type="reset"] {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        form.join-form button[type="reset"]:hover {
-            background-color: #5a6268;
-        }
-
-        /* Alignement des boutons */
-        .form-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-        }
-
-        /* Style de l'image de profil */
-        .profile-image-container {
+        .form-header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            color: #1f2937;
+            font-size: 1.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-image-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem;
         }
 
         .profile-image-container img {
-            width: 150px;
-            height: 150px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #007bff2b;
+            border: 4px solid #e5e7eb;
         }
 
-        /* Style des erreurs */
-        .text-sm.text-red-600 {
+        .image-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary-color);
+            border-radius: 50%;
+            padding: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-upload-overlay:hover {
+            background: var(--primary-hover);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 38px;
+            color: #6b7280;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .error-message {
+            color: var(--error-color);
             font-size: 0.875rem;
-            color: #dc3545;
             margin-top: 0.25rem;
         }
 
-        /* Style pour la grille des champs */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
+        .form-buttons {
+            display: flex;
             gap: 1rem;
+            margin-top: 2rem;
         }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
         .messages {
-        margin: 1rem 0;
-        padding: 1rem;
-        border-radius: 5px;
-        font-size: 1rem;
-        text-align: center;
-    }
+            max-width: 800px;
+            margin: 1rem auto;
+        }
 
-    .messages .success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
 
-    .messages .error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
+        .message.success {
+            background-color: #dcfce7;
+            color: var(--success-color);
+            border: 1px solid #86efac;
+        }
 
+        .message.error {
+            background-color: #fee2e2;
+            color: var(--error-color);
+            border: 1px solid #fca5a5;
+        }
 
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr 1fr;
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
             }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .form-submitted .loading-spinner {
+            display: inline-block;
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            background: #e5e7eb;
+        }
+
+        .password-strength.weak {
+            width: 33%;
+            background: #ef4444;
+        }
+
+        .password-strength.medium {
+            width: 66%;
+            background: #f59e0b;
+        }
+
+        .password-strength.strong {
+            width: 100%;
+            background: #10b981;
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .password-requirements li {
+            margin: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-requirements li.met {
+            color: #10b981;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 38px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .password-toggle:hover {
+            background: #f3f4f6;
+        }
+
+        /* Password match indicator */
+        .password-match-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            color: #6b7280;
+        }
+
+        .password-match-indicator.match {
+            color: #10b981;
+        }
+
+        .password-match-indicator.mismatch {
+            color: #ef4444;
         }
     </style>
 </head>
+
 <body>
-    <form action="{% url 'homepage' %}" method="post" class="join-form" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <!-- Image de profil -->
-        <div class="profile-image-container">
-            <label for="picture" class="block mb-2 text-lg">Une image de toi</label>
-            <img src="https://www.polytecsousse.tn/wp-content/uploads/2020/09/cropped-logo-polytech.png" 
-                 alt="Logo Polytech" 
-                 id="profile-preview">
-            <input type="file" name="picture" id="picture" class="mt-2" onchange="previewImage(event)">
-        </div>
-
-        <!-- Grille des champs -->
-        <div class="form-grid">
-            <div>
-                <label>Nom et prénom:</label> {{ form.full_name }}
-                <span class="text-sm text-red-600">{{ form.full_name.errors }}</span>
-            </div>
-
-            <div>
-                <label>Email:</label> {{ form.email }}
-                <span class="text-sm text-red-600">{{ form.email.errors }}</span>
-            </div>
-
-            <div>
-                <label>Titre :</label> {{ form.title }}
-                <span class="text-sm text-red-600">{{ form.title.errors }}</span>
-            </div>
-
-            <div>
-                <label>Compte Facebook:</label> {{ form.facebook }}
-                <span class="text-sm text-red-600">{{ form.facebook.errors }}</span>
-            </div>
-
-            <div>
-                <label>Compte Twitter:</label> {{ form.twitter }}
-                <span class="text-sm text-red-600">{{ form.twitter.errors }}</span>
-            </div>
-
-            <div>
-                <label>Compte LinkedIn:</label> {{ form.linkedin }}
-                <span class="text-sm text-red-600">{{ form.linkedin.errors }}</span>
-            </div>
-
-            <div>
-                <label>Site Web:</label> {{ form.website }}
-                <span class="text-sm text-red-600">{{ form.website.errors }}</span>
-            </div>
-        </div>
-
-        <!-- Boutons -->
-        <div class="form-buttons">
-            <button type="submit" class="bg-green">Valider</button>
-            <button type="reset" class="bg-green">Reset</button>
-        </div>
-    </form>
-
-    <!-- Script pour prévisualiser l'image -->
-    <script>
-        function previewImage(event) {
-            const reader = new FileReader();
-            const preview = document.getElementById('profile-preview');
-            reader.onload = function() {
-                preview.src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    </script>
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            <div class="{{ message.tags }}">{{ message }}</div>
+        <div class="message {{ message.tags }}">{{ message }}</div>
         {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
 
+    <form action="{% url 'homepage' %}" method="post" class="join-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-header">
+            <h1>Profile Information</h1>
+        </div>
+
+        <div class="profile-image-container">
+            <img src="{% if form.instance.picture %}{{ form.instance.picture.url }}{% else %}https://www.polytecsousse.tn/wp-content/uploads/2020/09/cropped-logo-polytech.png{% endif %}"
+                alt="Profile Preview" id="profile-preview">
+            <label for="picture" class="image-upload-overlay">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                </svg>
+            </label>
+            <input type="file" name="picture" id="picture" class="hidden" accept="image/*">
+        </div>
+
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="full_name">Nom et prénom</label>
+                <span class="input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                </span>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                <span class="error-message">{{ form.full_name.errors }}</span>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <label for="email">Email</label>
+                <span class="input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                </span>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <span class="error-message">{{ form.email.errors }}</span>
+                {% endif %}
+            </div>
+
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <span class="input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </span>
+                <input type="password" name="password" id="password" required class="password-input"
+                    placeholder="Entrez votre mot de passe">
+                <span class="password-toggle" onclick="togglePassword('password')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </span>
+                <div class="password-strength"></div>
+                <ul class="password-requirements">
+                    <li>Au moins 8 caractères</li>
+                    <li>Au moins une lettre majuscule</li>
+                    <li>Au moins un chiffre</li>
+                    <li>Au moins un caractère spécial</li>
+                </ul>
+            </div>
+
+            <div class="input-group">
+                <label for="confirm_password">Confirmer le mot de passe</label>
+                <span class="input-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </span>
+                <input type="password" name="confirm_password" id="confirm_password" required
+                    placeholder="Confirmez votre mot de passe">
+                <span class="password-toggle" onclick="togglePassword('confirm_password')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </span>
+                <div class="password-match-indicator"></div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="title">Titre</label>
+            <span class="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
+                    <line x1="16" y1="8" x2="2" y2="22" />
+                    <line x1="17.5" y1="15" x2="9" y2="15" />
+                </svg>
+            </span>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <span class="error-message">{{ form.title.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <label for="facebook">Facebook</label>
+            <span class="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+            </span>
+            {{ form.facebook }}
+            {% if form.facebook.errors %}
+            <span class="error-message">{{ form.facebook.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <label for="twitter">Twitter</label>
+            <span class="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+                </svg>
+            </span>
+            {{ form.twitter }}
+            {% if form.twitter.errors %}
+            <span class="error-message">{{ form.twitter.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <label for="linkedin">LinkedIn</label>
+            <span class="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                    <rect x="2" y="9" width="4" height="12" />
+                    <circle cx="4" cy="4" r="2" />
+                </svg>
+            </span>
+            {{ form.linkedin }}
+            {% if form.linkedin.errors %}
+            <span class="error-message">{{ form.linkedin.errors }}</span>
+            {% endif %}
+        </div>
+
+        <div class="input-group">
+            <label for="website">Site Web</label>
+            <span class="input-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </span>
+            {{ form.website }}
+            {% if form.website.errors %}
+            <span class="error-message">{{ form.website.errors }}</span>
+            {% endif %}
+        </div>
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">
+                Valider
+                <span class="loading-spinner"></span>
+            </button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
+    </form>
+    <script>
+        // Image preview functionality
+        document.getElementById('picture').addEventListener('change', function (event) {
+            const reader = new FileReader();
+            const preview = document.getElementById('profile-preview');
+
+            reader.onload = function () {
+                preview.src = reader.result;
+                preview.style.animation = 'fadeIn 0.3s ease';
+            };
+
+            if (event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        });
+
+        // Form submission handling with validation
+        document.querySelector('.join-form').addEventListener('submit', function (e) {
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="url"]');
+            let hasErrors = false;
+
+            // Basic validation
+            inputs.forEach(input => {
+                const errorSpan = input.parentElement.querySelector('.error-message') ||
+                    document.createElement('span');
+                errorSpan.className = 'error-message';
+
+                if (input.type === 'email' && input.value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(input.value)) {
+                        hasErrors = true;
+                        errorSpan.textContent = 'Please enter a valid email address';
+                        input.parentElement.appendChild(errorSpan);
+                        input.style.borderColor = 'var(--error-color)';
+                    }
+                }
+
+                if (input.type === 'url' && input.value) {
+                    try {
+                        new URL(input.value);
+                    } catch {
+                        hasErrors = true;
+                        errorSpan.textContent = 'Please enter a valid URL';
+                        input.parentElement.appendChild(errorSpan);
+                        input.style.borderColor = 'var(--error-color)';
+                    }
+                }
+
+                // Remove error styling on input
+                input.addEventListener('input', function () {
+                    this.style.borderColor = '';
+                    const errorSpan = this.parentElement.querySelector('.error-message');
+                    if (errorSpan) {
+                        errorSpan.remove();
+                    }
+                });
+            });
+
+            if (!hasErrors) {
+                form.classList.add('form-submitted');
+                submitBtn.disabled = true;
+            } else {
+                e.preventDefault();
+            }
+        });
+
+        // Form reset handling with confirmation
+        document.querySelector('button[type="reset"]').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent immediate reset
+
+            if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                const form = this.closest('form');
+                const preview = document.getElementById('profile-preview');
+
+                // Reset form fields
+                form.reset();
+
+                // Reset profile image to default
+                preview.src = 'https://www.polytecsousse.tn/wp-content/uploads/2020/09/cropped-logo-polytech.png';
+
+                // Reset all error messages and styling
+                form.querySelectorAll('.error-message').forEach(error => error.remove());
+                form.querySelectorAll('input').forEach(input => {
+                    input.style.borderColor = '';
+                });
+
+                // Show reset confirmation message
+                const messages = document.querySelector('.messages') || document.createElement('div');
+                messages.className = 'messages';
+                messages.innerHTML = `
+                    <div class="message success">
+                        Form has been reset successfully
+                    </div>
+                `;
+                if (!document.querySelector('.messages')) {
+                    form.parentElement.insertBefore(messages, form);
+                }
+
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    messages.remove();
+                }, 3000);
+            }
+        });
+
+        // Input field enhancements
+        document.querySelectorAll('.input-group input').forEach(input => {
+            // Add focus effects
+            input.addEventListener('focus', function () {
+                this.parentElement.querySelector('.input-icon').style.color = 'var(--primary-color)';
+            });
+
+            input.addEventListener('blur', function () {
+                this.parentElement.querySelector('.input-icon').style.color = '#6b7280';
+            });
+
+            // Add typing animation
+            input.addEventListener('input', function () {
+                this.style.transition = 'border-color 0.3s ease';
+                this.style.borderColor = 'var(--primary-color)';
+                setTimeout(() => {
+                    this.style.borderColor = '';
+                }, 300);
+            });
+        });
+
+        // Success message animation
+        if (document.querySelector('.messages')) {
+            setTimeout(() => {
+                document.querySelector('.messages').style.opacity = '0';
+                setTimeout(() => {
+                    document.querySelector('.messages').remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling.querySelector('svg');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = `
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                `;
+            } else {
+                input.type = 'password';
+                icon.innerHTML = `
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                `;
+            }
+        }
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function () {
+            const password = this.value;
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*]/.test(password)
+            };
+
+            // Update requirements list
+            const requirementsList = document.querySelectorAll('.password-requirements li');
+            requirementsList[0].classList.toggle('met', requirements.length);
+            requirementsList[1].classList.toggle('met', requirements.uppercase);
+            requirementsList[2].classList.toggle('met', requirements.number);
+            requirementsList[3].classList.toggle('met', requirements.special);
+
+            // Update strength indicator
+            const strengthIndicator = document.querySelector('.password-strength');
+            const metRequirements = Object.values(requirements).filter(Boolean).length;
+
+            strengthIndicator.className = 'password-strength';
+            if (metRequirements === 0) {
+                strengthIndicator.style.width = '0';
+            } else if (metRequirements <= 2) {
+                strengthIndicator.classList.add('weak');
+            } else if (metRequirements === 3) {
+                strengthIndicator.classList.add('medium');
+            } else {
+                strengthIndicator.classList.add('strong');
+            }
+        });
+
+        // Password match checker
+        document.getElementById('confirm_password').addEventListener('input', function () {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            const matchIndicator = document.querySelector('.password-match-indicator');
+
+            if (confirmPassword === '') {
+                matchIndicator.className = 'password-match-indicator';
+                matchIndicator.textContent = '';
+            } else if (password === confirmPassword) {
+                matchIndicator.className = 'password-match-indicator match';
+                matchIndicator.textContent = 'Les mots de passe correspondent';
+            } else {
+                matchIndicator.className = 'password-match-indicator mismatch';
+                matchIndicator.textContent = 'Les mots de passe ne correspondent pas';
+            }
+        });
+
+        // Add password validation to form submission
+        document.querySelector('.join-form').addEventListener('submit', function (e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*]/.test(password)
+            };
+
+            if (!Object.values(requirements).every(Boolean)) {
+                e.preventDefault();
+                alert('Veuillez respecter toutes les exigences du mot de passe');
+                return;
+            }
+        });
+    </script>
 </body>
+
 </html>

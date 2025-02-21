@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 32rem;
+            width: 100%;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+
+        .file-input-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-input-button:hover {
+            background-color: #e5e7eb;
+        }
+
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-button:hover {
+            background-color: #059669;
+        }
+
+        .submit-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #10b981;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .helptext {
+            display: block;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2 class="title">Demande de certification</h2>
+
+        <form method="post" enctype="multipart/form-data" id="certificationForm">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="full_name">Nom complet</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+                <span class="helptext">Nous utiliserons cette adresse pour vous contacter</span>
+            </div>
+
+            <div class="form-group">
+                <label for="certification_type">Type de certification</label>
+                <select id="certification_type" name="certification_type" required>
+                    <option value="">Sélectionnez un type</option>
+                    <option value="basic">Basic</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="documents">Documents justificatifs</label>
+                <div class="file-input-wrapper">
+                    <label class="file-input-button" for="documents">
+                        Choisir les fichiers
+                    </label>
+                    <input type="file" id="documents" name="documents" multiple accept=".pdf,.doc,.docx"
+                        style="display: none" required>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+                <span class="helptext">Formats acceptés: PDF, DOC, DOCX (Max 5MB)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="comments">Commentaires additionnels</label>
+                <textarea id="comments" name="comments" rows="4"></textarea>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-bar-fill"></div>
+            </div>
+
+            <button type="submit" class="submit-button" id="submitButton">
+                Soumettre la demande
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('certificationForm');
+        const fileInput = document.getElementById('documents');
+        const fileName = document.getElementById('fileName');
+        const progressBar = document.getElementById('progressBar');
+        const progressBarFill = document.querySelector('.progress-bar-fill');
+        const submitButton = document.getElementById('submitButton');
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) {
+                fileName.textContent = files.map(f => f.name).join(', ');
+                validateFiles(files);
+            } else {
+                fileName.textContent = '';
+            }
+        });
+
+        function validateFiles(files) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+            files.forEach(file => {
+                if (file.size > maxSize) {
+                    showError(`Le fichier ${file.name} dépasse la taille maximale de 5MB`);
+                    fileInput.value = '';
+                    fileName.textContent = '';
+                    return;
+                }
+
+                if (!validTypes.includes(file.type)) {
+                    showError(`Le type de fichier ${file.name} n'est pas accepté`);
+                    fileInput.value = '';
+                    fileName.textContent = '';
+                    return;
+                }
+            });
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (!form.checkValidity()) {
+                showError('Veuillez remplir tous les champs requis');
+                return;
+            }
+
+            submitButton.disabled = true;
+            progressBar.style.display = 'block';
+
+            // Simulate form submission with progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBarFill.style.width = `${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    showSuccess('Votre demande a été soumise avec succès');
+                    setTimeout(() => {
+                        form.submit();
+                    }, 1000);
+                }
+            }, 200);
+        });
+
+        function showError(message) {
+            const error = document.createElement('div');
+            error.className = 'error-message';
+            error.textContent = message;
+            form.appendChild(error);
+            setTimeout(() => error.remove(), 3000);
+        }
+
+        function showSuccess(message) {
+            const success = document.createElement('div');
+            success.className = 'success-message';
+            success.textContent = message;
+            form.appendChild(success);
+        }
+    </script>
+</body>
+
+</html>

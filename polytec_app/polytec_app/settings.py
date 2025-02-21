@@ -56,7 +56,7 @@ ROOT_URLCONF = 'polytec_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates")],  
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Add your templates directory here
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,9 +89,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_polytec_app',  # Mets le nom de ta base de données
         'USER': 'root',  # Par défaut, XAMPP utilise "root"
-        'PASSWORD': 'password123',  # Laisse vide si tu n'as pas défini de mot de passe
+        'PASSWORD': '',  # Laisse vide si tu n'as pas défini de mot de passe
         'HOST': '127.0.0.1',  # Utilise 127.0.0.1 au lieu de localhost pour éviter certains bugs
-        'PORT': '3306',  # Port MySQL par défaut dans XAMPP
+        'PORT': '3307',  # Port MySQL par défaut dans XAMPP
     }
 }
 
@@ -144,3 +144,5 @@ STATICFILES_DIRS = (
 )
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'uploads') 
+LOGIN_REDIRECT_URL = '/home/'  # Where to redirect after successful login
+LOGIN_URL = '/login/'          # Where to redirect for login_required
